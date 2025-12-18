@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Productivity Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #222;
+      color: white;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Productivity Analytics</h2>
+  <button onclick="loadTable()">Load Sites</button>
+<button onclick="loadWeeklyReport()">Load Weekly Report</button>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Productive</th>
+        <th>Non-Productive</th>
+        <th>Uncategorized</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><ul id="productive"></ul></td>
+        <td><ul id="unproductive"></ul></td>
+        <td><ul id="neutral"></ul></td>
+      </tr>
+    </tbody>
+  </table>
+<h2>Weekly Time Report (Last 7 Days)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Website</th>
+      <th>Category</th>
+      <th>Time Spent (minutes)</th>
+    </tr>
+  </thead>
+  <tbody id="weekly-body"></tbody>
+</table>
+
+<script>
+function loadWeeklyReport() {
+  fetch("http://localhost:5000/weekly-report")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("weekly-body");
+      tbody.innerHTML = "";
+
+      data.forEach(item => {
+        const tr = document.createElement("tr");
+
+        const site = document.createElement("td");
+        site.textContent = item._id.site;
+
+        const category = document.createElement("td");
+        category.textContent = item._id.category;
+
+        const time = document.createElement("td");
+        time.textContent = Math.round(item.totalTime / 60000);
+
+        tr.appendChild(site);
+        tr.appendChild(category);
+        tr.appendChild(time);
+
+        tbody.appendChild(tr);
+      });
+    });
+}
+</script>
+
+  <script>
+    function loadTable() {
+      fetch("http://localhost:5000/sites-by-category")
+        .then(res => res.json())
+        .then(data => {
+          // clear old data
+          ["productive", "unproductive", "neutral"].forEach(id => {
+            document.getElementById(id).innerHTML = "";
+          });
+
+          data.forEach(item => {
+            const category = item._id || "neutral";
+            const ul = document.getElementById(category);
+
+            if (!ul) return;
+
+            item.sites.forEach(site => {
+              const li = document.createElement("li");
+              li.textContent = site;
+              ul.appendChild(li);
+            });
+          });
+        });
+    }
+  </script>
+
+</body>
+</html>

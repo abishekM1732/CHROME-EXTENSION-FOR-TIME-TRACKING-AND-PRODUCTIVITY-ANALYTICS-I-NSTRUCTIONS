@@ -1,0 +1,20 @@
+{
+  "name": "Website Time Tracker",
+  "description": "Tracks time spent on websites and analyzes productivity",
+  "version": "1.0",
+  "manifest_version": 3,
+
+  "permissions": ["tabs", "storage", "activeTab"],
+
+  "host_permissions": [
+    "http://localhost:5000/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
